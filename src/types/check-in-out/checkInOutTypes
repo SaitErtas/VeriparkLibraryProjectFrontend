@@ -1,0 +1,9 @@
+export type CheckOutType = {
+  bookId: number
+  userName: string
+  tckn: number
+}
+
+export type CheckInType = {
+  chekcInOutId: number
+}
