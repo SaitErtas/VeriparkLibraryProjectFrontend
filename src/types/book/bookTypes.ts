@@ -12,7 +12,6 @@ export type BookListType = {
 }
 
 export type AddBookType = {
-  id: number
   name: string
   isbn: string
   price: number

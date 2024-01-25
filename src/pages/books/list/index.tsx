@@ -48,33 +48,8 @@ import toast from 'react-hot-toast'
 import auth from 'src/configs/auth'
 import { useRouter } from 'next/router'
 
-
-interface UserRoleType {
-  [key: string]: { icon: string; color: string }
-}
-
-interface UserStatusType {
-  [key: string]: ThemeColor
-}
-
-
-// ** Vars
-const userRoleObj: UserRoleType = {
-  admin: { icon: 'mdi:laptop', color: 'error.main' },
-  author: { icon: 'mdi:cog-outline', color: 'warning.main' },
-  editor: { icon: 'mdi:pencil-outline', color: 'info.main' },
-  maintainer: { icon: 'mdi:chart-donut', color: 'success.main' },
-  subscriber: { icon: 'mdi:account-outline', color: 'primary.main' }
-}
-
 interface CellType {
   row: BookListType
-}
-
-const userStatusObj: UserStatusType = {
-  active: 'success',
-  pending: 'warning',
-  inactive: 'secondary'
 }
 
 const LinkStyled = styled(Link)(({ theme }) => ({
@@ -88,22 +63,6 @@ const LinkStyled = styled(Link)(({ theme }) => ({
   }
 }))
 
-// ** renders client column
-const renderClient = (row: BookListType) => {
-  if (row.name.length) {
-    return <CustomAvatar src={row.isbn} sx={{ mr: 3, width: 34, height: 34 }} />
-  } else {
-    return (
-      <CustomAvatar
-        skin='light'
-        color={row.avatarColor || 'primary'}
-        sx={{ mr: 3, width: 34, height: 34, fontSize: '1rem' }}
-      >
-        {getInitials(row.name ? row.name : 'Atatürk')}
-      </CustomAvatar>
-    )
-  }
-}
 
 const RowOptions = ({ id }: { id: number | string }) => {
 
@@ -150,16 +109,16 @@ const RowOptions = ({ id }: { id: number | string }) => {
           onClick={handleRowOptionsClose}
           href='/apps/user/view/overview/'
         >
-          <Icon icon='mdi:eye-outline' fontSize={20} />
-          View
-        </MenuItem>
-        <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:pencil-outline' fontSize={20} />
+          <Icon icon='mdi:book-outline' fontSize={20} />
           Edit
         </MenuItem>
+        <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
+          <Icon icon='mdi:check-outline' fontSize={20} />
+          CheckOut
+        </MenuItem>
         <MenuItem onClick={handleCheckIn} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:delete-outline' fontSize={20} />
-          Delete
+          <Icon icon='icon-park:check-in' fontSize={20} />
+          CheckIn
         </MenuItem>
       </Menu>
     </>
@@ -171,20 +130,12 @@ const columns: GridColDef[] = [
     flex: 0.2,
     minWidth: 230,
     field: 'name',
-    headerName: 'User',
+    headerName: 'Name',
     renderCell: ({ row }: CellType) => {
-      const { name, isbn } = row
-
       return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {renderClient(row)}
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
-            <LinkStyled href='/apps/user/view/overview/'>{name}</LinkStyled>
-            <Typography noWrap variant='caption'>
-              {`@${name}`}
-            </Typography>
-          </Box>
-        </Box>
+        <Typography noWrap variant='body2'>
+          {row.name}
+        </Typography>
       )
     }
   },
@@ -208,9 +159,8 @@ const columns: GridColDef[] = [
     headerName: 'stockAmount',
     renderCell: ({ row }: CellType) => {
       return (
-        <Box sx={{ display: 'flex', alignItems: 'center', '& svg': { mr: 3, color: userRoleObj[row.stockAmount].color } }}>
-          <Icon icon={userRoleObj[row.stockAmount].icon} fontSize={20} />
-          <Typography noWrap sx={{ color: 'text.secondary', textTransform: 'capitalize' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography noWrap sx={{ color: 'text.secondary' }}>
             {row.stockAmount}
           </Typography>
         </Box>
@@ -224,26 +174,9 @@ const columns: GridColDef[] = [
     field: 'checkOutAmount',
     renderCell: ({ row }: CellType) => {
       return (
-        <Typography variant='subtitle1' noWrap sx={{ textTransform: 'capitalize' }}>
+        <Typography variant='subtitle1' noWrap >
           {row.checkOutAmount}
         </Typography>
-      )
-    }
-  },
-  {
-    flex: 0.1,
-    minWidth: 110,
-    field: 'status',
-    headerName: 'Status',
-    renderCell: ({ row }: CellType) => {
-      return (
-        <CustomChip
-          skin='light'
-          size='small'
-          label={row.status}
-          color={userStatusObj[row.name]}
-          sx={{ textTransform: 'capitalize', '& .MuiChip-label': { lineHeight: '18px' } }}
-        />
       )
     }
   },
@@ -270,7 +203,6 @@ const BookList = () => {
   const router = useRouter()
 
   // ** Hooks
-
   useEffect(() => {
     getBookList()
   }, [])
@@ -290,7 +222,7 @@ const BookList = () => {
     const responseData = await resultAxios?.data.result
 
     console.log("responseData:", responseData)
-    setBookList(responseData);
+    setBookList(responseData.books);
     setLoading(false)
   }
 
@@ -299,17 +231,13 @@ const BookList = () => {
 
   return (
     <Grid container spacing={6}>
-
-
-
       {bookList && <Grid item xs={12}>
         <Card>
+
           <DataGrid
             autoHeight
             rows={bookList}
             columns={columns}
-            checkboxSelection
-            disableRowSelectionOnClick
             pageSizeOptions={[10, 25, 50]}
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}

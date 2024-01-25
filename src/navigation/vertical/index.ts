@@ -24,16 +24,6 @@ const navigation = (): VerticalNavItemsType => {
       title: 'Books',
       path: '/books/list',
       icon: 'mdi:book-outline'
-    },
-    {
-      title: 'CheckOuts',
-      path: '/checkouts',
-      icon: 'mdi:check-outline'
-    },
-    {
-      title: 'CheckIns',
-      path: '/CheckIns',
-      icon: 'icon-park:check-in'
     }
   ]
 }
