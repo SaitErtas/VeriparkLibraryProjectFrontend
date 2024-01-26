@@ -1,6 +1,6 @@
 import { ThemeColor } from 'src/@core/layouts/types'
 
-export type BookListType = {
+export type BookListItemType = {
   id: number
   name: string
   isbn: string

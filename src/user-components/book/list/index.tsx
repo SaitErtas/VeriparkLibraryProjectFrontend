@@ -41,7 +41,7 @@ import UserAxiosHeader from 'src/configs/userAxiosHeader'
 
 import { CardStatsHorizontalProps } from 'src/@core/components/card-statistics/types'
 import { ThemeColor } from 'src/@core/layouts/types'
-import { BookListType } from 'src/types/book/bookTypes'
+import { BookListItemType } from 'src/types/book/bookTypes'
 import { AppDispatch, RootState } from 'src/store'
 import userAxios from 'src/user-functions/userAxios'
 import toast from 'react-hot-toast'
@@ -49,7 +49,7 @@ import auth from 'src/configs/auth'
 import { useRouter } from 'next/router'
 
 interface CellType {
-  row: BookListType
+  row: BookListItemType
 }
 
 const LinkStyled = styled(Link)(({ theme }) => ({
@@ -199,7 +199,7 @@ const BookList = () => {
 
   const [isLoading, setLoading] = useState(false)
   const [error, setError] = useState<boolean>(false)
-  const [bookList, setBookList] = useState<BookListType[]>()
+  const [bookList, setBookList] = useState<BookListItemType[]>()
   const router = useRouter()
 
   // ** Hooks
