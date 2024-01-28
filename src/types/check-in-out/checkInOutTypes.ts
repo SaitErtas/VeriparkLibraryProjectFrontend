@@ -3,9 +3,21 @@ export type CheckOutType = {
   userName: string
   bookName: string
   tckn: number
-  phoneNumber: number
+  phoneNumber: string
 }
 
-export type CheckInType = {
+export type CheckInPostType = {
   chekcInOutId: number
+}
+
+export type BookCheckInOutsType = {
+  id: number
+  userName: string
+  tckn: number
+  phoneNumber: number
+  checkOutDate: Date
+  checkInDate: Date
+  realizedCheckInDate: Date
+  punishmentDayCount: number
+  punishmentAmount: number
 }

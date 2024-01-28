@@ -15,19 +15,19 @@ export default function CheckOutBook(props: { openCheckOutBookPopup: boolean, cl
   const { direction } = theme
   const popperPlacement: ReactDatePickerProps['popperPlacement'] = direction === 'ltr' ? 'bottom-start' : 'bottom-end'
   const { t } = useTranslation()
-  const [isLoadingForAddBook, setIsLoadingForAddBook] = useState(false)
-  const [checkOutBookType, setCheckOutBookType] = useState<CheckOutType>({ bookId: props.bookListItem.id, bookName: props.bookListItem.name, userName: "", tckn: 0, phoneNumber: 0 })
+  const [isLoadingForCheckOutBook, setIsLoadingForCheckOutBook] = useState(false)
+  const [checkOutBookType, setCheckOutBookType] = useState<CheckOutType>({ bookId: props.bookListItem.id, bookName: props.bookListItem.name, userName: "", tckn: 0, phoneNumber: "" })
 
 
   useEffect(() => {
-    setCheckOutBookType({ bookId: props.bookListItem.id, bookName: props.bookListItem.name, userName: "", tckn: 0, phoneNumber: 0 })
+    setCheckOutBookType({ bookId: props.bookListItem.id, bookName: props.bookListItem.name, userName: "", tckn: 0, phoneNumber: "" })
   }, [props.bookListItem.id, props.bookListItem.name])
 
   const CheckOutBook = async () => {
 
-    setIsLoadingForAddBook(true)
+    setIsLoadingForCheckOutBook(true)
     const resultAxios = await userAxios.post({
-      method: 'Books/create-book/',
+      method: 'Books/book-check-out/',
 
       data: checkOutBookType
 
@@ -36,8 +36,8 @@ export default function CheckOutBook(props: { openCheckOutBookPopup: boolean, cl
 
     if (resultAxios?.status == 200) await toast.success(t('CheckOut book is successfull').toString())
 
-    setCheckOutBookType({ bookId: 0, bookName: "", userName: "", tckn: 0, phoneNumber: 0 })
-    setIsLoadingForAddBook(false)
+    setCheckOutBookType({ bookId: 0, bookName: "", userName: "", tckn: 0, phoneNumber: "" })
+    setIsLoadingForCheckOutBook(false)
 
     props.closeCheckOutBookDialog()
   }
@@ -113,13 +113,12 @@ export default function CheckOutBook(props: { openCheckOutBookPopup: boolean, cl
             <Box sx={{ mt: 1, mb: 5 }}>
               <TextField
                 fullWidth
-                type="number"
                 InputLabelProps={{ shrink: true }}
                 label={t('PhoneNumber')}
                 value={checkOutBookType.phoneNumber}
                 onChange={e => {
                   setCheckOutBookType({
-                    bookId: checkOutBookType.bookId, bookName: checkOutBookType.bookName, userName: checkOutBookType.userName, tckn: checkOutBookType.tckn, phoneNumber: Number(e.target.value)
+                    bookId: checkOutBookType.bookId, bookName: checkOutBookType.bookName, userName: checkOutBookType.userName, tckn: checkOutBookType.tckn, phoneNumber: e.target.value
                   })
                 }}
               />
@@ -127,14 +126,14 @@ export default function CheckOutBook(props: { openCheckOutBookPopup: boolean, cl
           </Box>{' '}
         </DialogContent>
         <DialogActions sx={{ pb: { xs: 8, sm: 12.5 }, justifyContent: 'center' }}>
-          {isLoadingForAddBook && (
+          {isLoadingForCheckOutBook && (
             <Fragment>
               <CircularProgress color='inherit' size={20} />
             </Fragment>
           )}
-          {!isLoadingForAddBook && (
-            <Button variant='contained' disabled={isLoadingForAddBook} sx={{ width: "100%" }} color='primary' onClick={async () => {
-              setIsLoadingForAddBook(true);
+          {!isLoadingForCheckOutBook && (
+            <Button variant='contained' disabled={isLoadingForCheckOutBook} sx={{ width: "100%" }} color='primary' onClick={async () => {
+              setIsLoadingForCheckOutBook(true);
               await CheckOutBook();
             }
             }>
