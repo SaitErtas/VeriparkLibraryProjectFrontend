@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { Fragment, useEffect, useState } from "react"
 import toast from "react-hot-toast";
 import userAxios from "src/user-functions/userAxios";
-import { CheckOutType } from "src/types/check-in-out/checkInOutTypes";
+import { BookCheckInOutType, CheckOutType } from "src/types/check-in-out/checkInOutTypes";
 import { BookListItemType } from "src/types/book/bookTypes";
 import { ReactDatePickerProps } from "react-datepicker";
-import CheckInWizardMain from "./CheckInWizardMain";
+import CheckInWizardMain from "./checkInWizardMain";
+
 
 export default function CheckInBookMain(props: { openCheckInBookPopup: boolean, closeCheckInBookDialog: () => void, bookListItem: BookListItemType }) {
 
@@ -17,38 +18,30 @@ export default function CheckInBookMain(props: { openCheckInBookPopup: boolean, 
   const popperPlacement: ReactDatePickerProps['popperPlacement'] = direction === 'ltr' ? 'bottom-start' : 'bottom-end'
   const { t } = useTranslation()
   const [isLoadingForCheckOutBook, setIsLoadingForCheckOutBook] = useState(false)
-  const [checkOutBookType, setCheckOutBookType] = useState<CheckOutType>({ bookId: props.bookListItem.id, bookName: props.bookListItem.name, userName: "", tckn: 0, phoneNumber: "" })
-
+  const [bookCheckInOutList, setBookCheckInOutList] = useState<BookCheckInOutType[]>()
+  const [isLoading, setLoading] = useState(false)
+  const [error, setError] = useState<boolean>(false)
 
   useEffect(() => {
-    setCheckOutBookType({ bookId: props.bookListItem.id, bookName: props.bookListItem.name, userName: "", tckn: 0, phoneNumber: "" })
-  }, [props.bookListItem.id, props.bookListItem.name])
+    const getCheckedOutList = async () => {
 
-  const CheckOutBook = async () => {
+      setIsLoadingForCheckOutBook(true)
+      setLoading(true)
+      const resultAxios = await userAxios.get({
+        method: 'Books/get-checked-out-list/'
+      })
+      const responseData = await resultAxios?.data.result
 
-    setIsLoadingForCheckOutBook(true)
-    const resultAxios = await userAxios.post({
-      method: 'Books/book-check-out/',
-
-      data: checkOutBookType
-
-    })
-    const responseData = await resultAxios?.data.result
-
-    if (resultAxios?.status == 200) await toast.success(t('CheckOut book is successfull').toString())
-
-    setCheckOutBookType({ bookId: 0, bookName: "", userName: "", tckn: 0, phoneNumber: "" })
-    setIsLoadingForCheckOutBook(false)
-
-    props.closeCheckInBookDialog()
-  }
+      console.log("responseData:", responseData)
+      setBookCheckInOutList(responseData.books);
+      setLoading(false)
+      props.closeCheckInBookDialog()
+    }
+    getCheckedOutList()
+  }, [props, props.bookListItem.id])
 
   return (
     <Fragment>
-
-
-
-
 
       <Dialog
         fullWidth
@@ -57,7 +50,7 @@ export default function CheckInBookMain(props: { openCheckInBookPopup: boolean, 
         scroll='body'
         onClose={() => props.closeCheckInBookDialog()}
       >
-        <CheckInWizardMain></CheckInWizardMain>
+        <CheckInWizardMain bookCheckInOutList={bookCheckInOutList} closeCheckInBookDialog={props.closeCheckInBookDialog} ></CheckInWizardMain>
       </Dialog>
 
 

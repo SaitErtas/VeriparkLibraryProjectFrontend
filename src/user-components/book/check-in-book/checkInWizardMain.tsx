@@ -20,6 +20,7 @@ import StepCheckInConfirmation from './stepCheckInConfirmation'
 
 // ** Styled Components
 import StepperWrapper from 'src/@core/styles/mui/stepper'
+import { BookCheckInOutType } from 'src/types/check-in-out/checkInOutTypes'
 
 const steps = [
   {
@@ -98,7 +99,7 @@ const Stepper = styled(MuiStepper)<StepperProps>(({ theme }) => ({
   }
 }))
 
-const CheckInWizardMain = () => {
+const CheckInWizardMain = (props: { closeCheckInBookDialog: () => void, bookCheckInOutList: BookCheckInOutType[] | undefined }) => {
   // ** States
   const [activeStep, setActiveStep] = useState<number>(0)
 

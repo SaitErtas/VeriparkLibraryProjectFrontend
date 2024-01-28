@@ -25,6 +25,15 @@ import CustomChip from 'src/@core/components/mui/chip'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
+import { GridColDef, DataGrid, GridToolbar } from '@mui/x-data-grid'
+import { BookCheckInOutType } from 'src/types/check-in-out/checkInOutTypes'
+import { Menu, MenuItem } from '@mui/material'
+import { useState } from 'react'
+
+interface CellType {
+  row: BookCheckInOutType
+}
+
 
 const StyledList = styled(List)<ListProps>(({ theme }) => ({
   padding: 0,
@@ -64,259 +73,166 @@ const StyledList = styled(List)<ListProps>(({ theme }) => ({
 const StepCart = ({ handleNext }: { handleNext: () => void }) => {
   const breakpointMD = useMediaQuery((theme: Theme) => theme.breakpoints.between('sm', 'lg'))
 
+  const RowOptions = ({ row }: { row: BookCheckInOutType }) => {
+
+    // ** State
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+
+    const rowOptionsOpen = Boolean(anchorEl)
+
+    const handleRowOptionsClick = (event: MouseEvent<HTMLElement>) => {
+      setAnchorEl(event.currentTarget)
+    }
+    const handleRowOptionsClose = () => {
+      setAnchorEl(null)
+    }
+
+    const handleCheckIn = () => {
+
+      handleRowOptionsClose()
+    }
+
+    const handleCheckOut = () => {
+      console.log(row)
+      setBookListItem(row)
+      setOpenCheckOutBookPopup(true)
+      handleRowOptionsClose()
+
+    }
+
+    return (
+      <>
+        <IconButton size='small' onClick={handleRowOptionsClick}>
+          <Icon icon='mdi:dots-vertical' />
+        </IconButton>
+        <Menu
+          keepMounted
+          anchorEl={anchorEl}
+          open={rowOptionsOpen}
+          onClose={handleRowOptionsClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right'
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right'
+          }}
+          PaperProps={{ style: { minWidth: '8rem' } }}
+        >
+          <MenuItem
+            component={Link}
+            sx={{ '& svg': { mr: 2 } }}
+            onClick={handleRowOptionsClose}
+            href='/apps/user/view/overview/'
+          >
+            <Icon icon='mdi:book-outline' fontSize={20} />
+            Edit
+          </MenuItem>
+          <MenuItem onClick={handleCheckOut} sx={{ '& svg': { mr: 2 } }}>
+            <Icon icon='mdi:check-outline' fontSize={20} />
+            CheckOut
+          </MenuItem>
+          <MenuItem onClick={handleCheckIn} sx={{ '& svg': { mr: 2 } }}>
+            <Icon icon='icon-park:check-in' fontSize={20} />
+            CheckIn
+          </MenuItem>
+        </Menu>
+      </>
+    )
+  }
+
+
+  const columns: GridColDef[] = [
+    {
+      flex: 0.2,
+      minWidth: 230,
+      field: 'id',
+      headerName: 'Id',
+      renderCell: ({ row }: CellType) => {
+        return (
+          <Typography noWrap variant='body2'>
+            {row.id}
+          </Typography>
+        )
+      }
+    },
+    {
+      flex: 0.2,
+      minWidth: 250,
+      field: 'userName',
+      headerName: 'UserName',
+      renderCell: ({ row }: CellType) => {
+        return (
+          <Typography noWrap variant='body2'>
+            {row.userName}
+          </Typography>
+        )
+      }
+    },
+    {
+      flex: 0.15,
+      field: 'tckn',
+      minWidth: 150,
+      headerName: 'Tckn',
+      renderCell: ({ row }: CellType) => {
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Typography noWrap sx={{ color: 'text.secondary' }}>
+              {row.tckn}
+            </Typography>
+          </Box>
+        )
+      }
+    },
+    {
+      flex: 0.15,
+      minWidth: 120,
+      headerName: 'PhoneNumber',
+      field: 'phoneNumber',
+      renderCell: ({ row }: CellType) => {
+        return (
+          <Typography variant='subtitle1' noWrap >
+            {row.phoneNumber}
+          </Typography>
+        )
+      }
+    },
+    {
+      flex: 0.1,
+      minWidth: 90,
+      sortable: false,
+      field: 'actions',
+      headerName: 'Actions',
+      renderCell: ({ row }: CellType) => <RowOptions row={row} />
+    }
+  ]
+
+
   return (
     <Grid container spacing={6}>
-      <Grid item xs={12} lg={8}>
-        <Alert severity='success' icon={<Icon icon='mdi:tag-outline' />} sx={{ mb: 4 }}>
-          <AlertTitle>Available Offers</AlertTitle>
-          <div>
-            <Typography sx={{ color: 'success.main' }}>
-              - 10% Instant Discount on Bank of America Corp Bank Debit and Credit cards
-            </Typography>
-            <Typography sx={{ color: 'success.main' }}>
-              - 25% Cashback Voucher of up to $60 on first ever PayPal transaction. TCA
-            </Typography>
-          </div>
-        </Alert>
-        <Typography variant='h6' sx={{ mb: 4 }}>
-          My Shopping Bag (2 Items)
-        </Typography>
-        <StyledList sx={{ mb: 4 }}>
-          <ListItem>
-            <ListItemAvatar>
-              <img width={140} src='/images/products/google-home.png' alt='Google Home' />
-            </ListItemAvatar>
-            <IconButton size='small' className='remove-item' sx={{ color: 'text.primary' }}>
-              <Icon icon='mdi:close' fontSize={20} />
-            </IconButton>
-            <Grid container>
-              <Grid item xs={12} md={8}>
-                <ListItemText primary='Google - Google Home - White' />
-                <Box sx={{ display: 'flex' }}>
-                  <Typography sx={{ mr: 2, color: 'text.disabled' }}>Sold By:</Typography>
-                  <Typography
-                    href='/'
-                    component={Link}
-                    onClick={e => e.preventDefault()}
-                    sx={{ mr: 4, color: 'primary.main', textDecoration: 'none' }}
-                  >
-                    Google
-                  </Typography>
-                  <CustomChip size='small' skin='light' color='success' label='In Stock' />
-                </Box>
-                <Rating name='google-nest-rating' value={4} readOnly sx={{ mb: 6 }} />
-                <TextField size='small' type='number' defaultValue='1' sx={{ maxWidth: 100, display: 'block' }} />
-              </Grid>
-              <Grid item xs={12} md={4} sx={{ mt: [6, 6, 8] }}>
-                <Box
-                  sx={{
-                    gap: 3,
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    alignItems: { xs: 'flex-start', md: 'flex-end' }
-                  }}
-                >
-                  <Box sx={{ display: 'flex' }}>
-                    <Typography sx={{ color: 'primary.main' }}>$299</Typography>
-                    <Typography sx={{ color: 'text.disabled', textDecoration: 'line-through' }}>/$359</Typography>
-                  </Box>
-                  <Button variant='outlined' size='small'>
-                    Move to wishlist
-                  </Button>
-                </Box>
-              </Grid>
-            </Grid>
-          </ListItem>
-          <ListItem>
-            <ListItemAvatar>
-              <img width={140} src='/images/products/iphone-11.png' alt='iphone 11' />
-            </ListItemAvatar>
-            <IconButton size='small' className='remove-item' sx={{ color: 'text.primary' }}>
-              <Icon icon='mdi:close' fontSize={20} />
-            </IconButton>
-            <Grid container>
-              <Grid item xs={12} md={8}>
-                <ListItemText primary='Apple iPhone 11 (64GB, Black)' />
-                <Box sx={{ display: 'flex' }}>
-                  <Typography sx={{ mr: 2, color: 'text.disabled' }}>Sold By:</Typography>
-                  <Typography
-                    href='/'
-                    component={Link}
-                    onClick={e => e.preventDefault()}
-                    sx={{ mr: 4, color: 'primary.main', textDecoration: 'none' }}
-                  >
-                    Apple
-                  </Typography>
-                  <CustomChip size='small' skin='light' color='success' label='In Stock' />
-                </Box>
-                <Rating name='iphone-11-rating' value={4} readOnly sx={{ mb: 6 }} />
-                <TextField size='small' type='number' defaultValue='1' sx={{ maxWidth: 100, display: 'block' }} />
-              </Grid>
-              <Grid item xs={12} md={4} sx={{ mt: [6, 6, 8] }}>
-                <Box
-                  sx={{
-                    gap: 3,
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    alignItems: { xs: 'flex-start', md: 'flex-end' }
-                  }}
-                >
-                  <Box sx={{ display: 'flex' }}>
-                    <Typography sx={{ color: 'primary.main' }}>$899</Typography>
-                    <Typography sx={{ color: 'text.disabled', textDecoration: 'line-through' }}>/$999</Typography>
-                  </Box>
-                  <Button variant='outlined' size='small'>
-                    Move to wishlist
-                  </Button>
-                </Box>
-              </Grid>
-            </Grid>
-          </ListItem>
-        </StyledList>
-        <Box
-          sx={{
-            px: 5,
-            gap: 2,
-            py: 2.5,
-            display: 'flex',
-            borderRadius: 1,
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            border: theme => `1px solid ${theme.palette.divider}`
-          }}
-        >
-          <Typography
-            href='/'
-            component={Link}
-            onClick={e => e.preventDefault()}
-            sx={{ color: 'primary.main', textDecoration: 'none' }}
-          >
-            Add more products from wishlist
-          </Typography>
-          <Icon icon='mdi:chevron-right' />
-        </Box>
-      </Grid>
+
       <Grid item xs={12} lg={4}>
-        <Box sx={{ mb: 4, borderRadius: 1, border: theme => `1px solid ${theme.palette.divider}` }}>
-          <CardContent>
-            <Typography sx={{ mb: 4, fontWeight: 600 }}>Offer</Typography>
-            <Box sx={{ mb: 4, display: 'flex', alignItems: 'center' }}>
-              <TextField fullWidth sx={{ mr: 4 }} size='small' placeholder='Enter Promo Code' />
-              <Button variant='outlined'>Apply</Button>
-            </Box>
-            <Box sx={{ p: 4, borderRadius: 1, backgroundColor: 'action.hover' }}>
-              <Typography sx={{ mb: 2, fontWeight: 600 }}>Buying gift for a loved one?</Typography>
-              <Typography sx={{ mb: 2, color: 'text.secondary' }}>
-                Gift wrap and personalized message on card, Only for $2.
-              </Typography>
-              <Typography
-                href='/'
-                variant='body2'
-                component={Link}
-                onClick={e => e.preventDefault()}
-                sx={{ color: 'primary.main', fontWeight: 600, textDecoration: 'none' }}
-              >
-                Add a gift wrap
-              </Typography>
-            </Box>
-          </CardContent>
-          <Divider sx={{ my: '0 !important' }} />
-          <CardContent>
-            <Typography sx={{ mb: 4, fontWeight: 600 }}>Price Details</Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <Box
-                sx={{
-                  mb: 2,
-                  gap: 2,
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <Typography variant='body2' sx={{ color: 'text.primary' }}>
-                  Bag Total
-                </Typography>
-                <Typography variant='body2'>$1198.00</Typography>
-              </Box>
-              <Box
-                sx={{
-                  mb: 2,
-                  gap: 2,
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <Typography variant='body2' sx={{ color: 'text.primary' }}>
-                  Coupon Discount
-                </Typography>
-                <Typography
-                  href='/'
-                  variant='body2'
-                  component={Link}
-                  onClick={e => e.preventDefault()}
-                  sx={{ display: 'block', fontWeight: 600, color: 'primary.main', textDecoration: 'none' }}
-                >
-                  Apply Coupon
-                </Typography>
-              </Box>
-              <Box
-                sx={{
-                  mb: 2,
-                  gap: 2,
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <Typography variant='body2' sx={{ color: 'text.primary' }}>
-                  Order Total
-                </Typography>
-                <Typography variant='body2'>$1198.00</Typography>
-              </Box>
-              <Box
-                sx={{
-                  gap: 2,
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <Typography variant='body2' sx={{ color: 'text.primary' }}>
-                  Delivery Charges
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <Typography variant='body2' sx={{ mr: 2, textDecoration: 'line-through', color: 'text.disabled' }}>
-                    $5.00
-                  </Typography>
-                  <CustomChip size='small' skin='light' color='success' label='Free' />
-                </Box>
-              </Box>
-            </Box>
-          </CardContent>
-          <Divider sx={{ my: '0 !important' }} />
-          <CardContent sx={{ py: theme => `${theme.spacing(3.5)} !important` }}>
-            <Box
-              sx={{ gap: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}
-            >
-              <Typography sx={{ fontWeight: 600 }}>Total</Typography>
-              <Typography sx={{ fontWeight: 600 }}>$1198.00</Typography>
-            </Box>
-          </CardContent>
-        </Box>
-        <Box sx={{ display: 'flex', ...(breakpointMD ? { justifyContent: 'flex-end' } : {}) }}>
-          <Button fullWidth={!breakpointMD} variant='contained' onClick={handleNext}>
-            Place Order
-          </Button>
-        </Box>
+        {
+
+          bookList && <DataGrid
+            autoHeight
+            disableColumnFilter
+            disableColumnSelector
+            disableDensitySelector
+            rows={bookList}
+            columns={columns}
+            pageSizeOptions={[10, 25, 50]}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            slots={{ toolbar: GridToolbar }}
+            slotProps={{
+              toolbar: {
+                showQuickFilter: true,
+              },
+            }}
+          />
+        }
       </Grid>
     </Grid>
   )

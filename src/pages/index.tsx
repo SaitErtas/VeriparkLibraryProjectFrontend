@@ -215,8 +215,6 @@ const Home = () => {
       method: 'Books/list/'
     })
     const responseData = await resultAxios?.data.result
-
-    console.log("responseData:", responseData)
     setBookList(responseData.books);
     setLoading(false)
   }

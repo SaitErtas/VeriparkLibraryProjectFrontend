@@ -10,7 +10,7 @@ export type CheckInPostType = {
   chekcInOutId: number
 }
 
-export type BookCheckInOutsType = {
+export type BookCheckInOutType = {
   id: number
   userName: string
   tckn: number
