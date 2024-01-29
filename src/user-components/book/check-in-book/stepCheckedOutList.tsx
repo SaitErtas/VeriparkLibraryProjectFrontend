@@ -25,7 +25,7 @@ import CustomChip from 'src/@core/components/mui/chip'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
-import { GridColDef, DataGrid, GridToolbar } from '@mui/x-data-grid'
+import { GridColDef, DataGrid, GridToolbar, GridRowParams } from '@mui/x-data-grid'
 import { BookCheckInOutType } from 'src/types/check-in-out/checkInOutTypes'
 import { Menu, MenuItem } from '@mui/material'
 import { useState } from 'react'
@@ -70,77 +70,14 @@ const StyledList = styled(List)<ListProps>(({ theme }) => ({
   }
 }))
 
-const StepCart = ({ handleNext }: { handleNext: () => void }) => {
+
+
+
+const StepCheckedOutList = (props: { handleNext: () => void, bookCheckInOutList: BookCheckInOutType[] | undefined, setBookCheckInOutItem: any }) => {
   const breakpointMD = useMediaQuery((theme: Theme) => theme.breakpoints.between('sm', 'lg'))
 
-  const RowOptions = ({ row }: { row: BookCheckInOutType }) => {
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
 
-    // ** State
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-
-    const rowOptionsOpen = Boolean(anchorEl)
-
-    const handleRowOptionsClick = (event: MouseEvent<HTMLElement>) => {
-      setAnchorEl(event.currentTarget)
-    }
-    const handleRowOptionsClose = () => {
-      setAnchorEl(null)
-    }
-
-    const handleCheckIn = () => {
-
-      handleRowOptionsClose()
-    }
-
-    const handleCheckOut = () => {
-      console.log(row)
-      setBookListItem(row)
-      setOpenCheckOutBookPopup(true)
-      handleRowOptionsClose()
-
-    }
-
-    return (
-      <>
-        <IconButton size='small' onClick={handleRowOptionsClick}>
-          <Icon icon='mdi:dots-vertical' />
-        </IconButton>
-        <Menu
-          keepMounted
-          anchorEl={anchorEl}
-          open={rowOptionsOpen}
-          onClose={handleRowOptionsClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right'
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right'
-          }}
-          PaperProps={{ style: { minWidth: '8rem' } }}
-        >
-          <MenuItem
-            component={Link}
-            sx={{ '& svg': { mr: 2 } }}
-            onClick={handleRowOptionsClose}
-            href='/apps/user/view/overview/'
-          >
-            <Icon icon='mdi:book-outline' fontSize={20} />
-            Edit
-          </MenuItem>
-          <MenuItem onClick={handleCheckOut} sx={{ '& svg': { mr: 2 } }}>
-            <Icon icon='mdi:check-outline' fontSize={20} />
-            CheckOut
-          </MenuItem>
-          <MenuItem onClick={handleCheckIn} sx={{ '& svg': { mr: 2 } }}>
-            <Icon icon='icon-park:check-in' fontSize={20} />
-            CheckIn
-          </MenuItem>
-        </Menu>
-      </>
-    )
-  }
 
 
   const columns: GridColDef[] = [
@@ -198,29 +135,27 @@ const StepCart = ({ handleNext }: { handleNext: () => void }) => {
         )
       }
     },
-    {
-      flex: 0.1,
-      minWidth: 90,
-      sortable: false,
-      field: 'actions',
-      headerName: 'Actions',
-      renderCell: ({ row }: CellType) => <RowOptions row={row} />
-    }
+
   ]
 
 
+
+  function handleRowClick(row: any) {
+    props.setBookCheckInOutItem(row);
+    props.handleNext();
+  }
+
   return (
     <Grid container spacing={6}>
-
-      <Grid item xs={12} lg={4}>
+      <Grid item xs={12} xl={12} lg={12} sm={12} >
         {
-
-          bookList && <DataGrid
+          props.bookCheckInOutList && <DataGrid
             autoHeight
             disableColumnFilter
             disableColumnSelector
             disableDensitySelector
-            rows={bookList}
+            onRowClick={async (e) => handleRowClick(e.row)}
+            rows={props.bookCheckInOutList}
             columns={columns}
             pageSizeOptions={[10, 25, 50]}
             paginationModel={paginationModel}
@@ -238,4 +173,4 @@ const StepCart = ({ handleNext }: { handleNext: () => void }) => {
   )
 }
 
-export default StepCart
+export default StepCheckedOutList

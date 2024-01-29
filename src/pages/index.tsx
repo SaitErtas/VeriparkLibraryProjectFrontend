@@ -29,6 +29,7 @@ import BlankLayout from 'src/@core/layouts/BlankLayout'
 import { Button, useTheme } from '@mui/material'
 import AddBook from 'src/user-components/book/add-book';
 import CheckOutBook from 'src/user-components/book/check-out-book';
+import CheckInBookMain from 'src/user-components/book/check-in-book';
 
 
 interface CellType {
@@ -83,7 +84,8 @@ const Home = () => {
     }
 
     const handleCheckIn = () => {
-
+      setBookListItem(row)
+      setOpenCheckInBookPopup(true)
       handleRowOptionsClose()
     }
 
@@ -229,6 +231,10 @@ const Home = () => {
     setOpenCheckOutBookPopup(false)
     getBookList();
   }
+  const closeCheckInBookDialog = () => {
+    setOpenCheckInBookPopup(false)
+    getBookList();
+  }
 
   return (
 
@@ -290,6 +296,12 @@ const Home = () => {
 
       <AddBook openAddBookPopup={openAddBookPopup} closeAddBookDialog={closeAddBookDialog} ></AddBook>
       {bookListItem && <CheckOutBook openCheckOutBookPopup={openCheckOutBookPopup} closeCheckOutBookDialog={closeCheckOutBookDialog} bookListItem={bookListItem} ></CheckOutBook>}
+
+      <Grid item xs={12} xl={8} lg={8} sm={8}>
+      {bookListItem && <CheckInBookMain openCheckInBookPopup={openCheckInBookPopup} closeCheckInBookDialog={closeCheckInBookDialog} bookListItem={bookListItem}></CheckInBookMain>}
+      </Grid>
+
+
     </Grid >
 
   )

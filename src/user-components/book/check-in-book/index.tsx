@@ -33,11 +33,10 @@ export default function CheckInBookMain(props: { openCheckInBookPopup: boolean, 
       const responseData = await resultAxios?.data.result
 
       console.log("responseData:", responseData)
-      setBookCheckInOutList(responseData.books);
+      setBookCheckInOutList(responseData.bookCheckInOuts);
       setLoading(false)
-      props.closeCheckInBookDialog()
     }
-    getCheckedOutList()
+    if (props.openCheckInBookPopup) getCheckedOutList()
   }, [props, props.bookListItem.id])
 
   return (
@@ -46,11 +45,19 @@ export default function CheckInBookMain(props: { openCheckInBookPopup: boolean, 
       <Dialog
         fullWidth
         open={props.openCheckInBookPopup}
-        maxWidth='sm'
+        maxWidth='lg'
         scroll='body'
         onClose={() => props.closeCheckInBookDialog()}
       >
-        <CheckInWizardMain bookCheckInOutList={bookCheckInOutList} closeCheckInBookDialog={props.closeCheckInBookDialog} ></CheckInWizardMain>
+        <DialogContent sx={{ pb: 6, px: { xs: 8, sm: 15 }, pt: { xs: 8, sm: 12.5 }, position: 'relative' }}>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              {props.bookListItem.name + " " + "CheckIn Progress"}
+            </Typography>
+
+          </Box>
+          {bookCheckInOutList && <CheckInWizardMain bookCheckInOutList={bookCheckInOutList} closeCheckInBookDialog={props.closeCheckInBookDialog} ></CheckInWizardMain>}
+        </DialogContent>
       </Dialog>
 
 
