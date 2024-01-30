@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 
 // ** MUI Imports
 import Card from '@mui/material/Card'
@@ -21,8 +21,11 @@ import StepCheckInConfirmation from './stepCheckInConfirmation'
 // ** Styled Components
 import StepperWrapper from 'src/@core/styles/mui/stepper'
 import { BookCheckInOutType } from 'src/types/check-in-out/checkInOutTypes'
-import { Button } from '@mui/material'
+import { Button, CircularProgress } from '@mui/material'
 import { Box } from '@mui/system'
+import userAxios from 'src/user-functions/userAxios'
+import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 
 const steps = [
   {
@@ -105,6 +108,9 @@ const CheckInWizardMain = (props: { closeCheckInBookDialog: () => void, bookChec
   // ** States
   const [activeStep, setActiveStep] = useState<number>(0)
   const [bookCheckInOutItem, setBookCheckInOutItem] = useState<BookCheckInOutType | undefined>()
+  const [isLoading, setLoading] = useState(false)
+  const [error, setError] = useState<boolean>(false)
+  const { t } = useTranslation()
 
   // Handle Stepper
   const handleNext = () => {
@@ -117,9 +123,22 @@ const CheckInWizardMain = (props: { closeCheckInBookDialog: () => void, bookChec
     }
   }
 
-  const submitCheckIn = (_bookCheckInOutItem: BookCheckInOutType | undefined) => {
-    null
+  const submitCheckIn = async (_bookCheckInOutItem: BookCheckInOutType | undefined) => {
+
+    setLoading(true)
+    const resultAxios = await userAxios.post({
+      method: 'Books/book-check-in/',
+      data: _bookCheckInOutItem
+    })
+    const responseData = await resultAxios?.data.result
+    setLoading(false)
+
+    if (resultAxios?.status == 200) await toast.success(t('CheckIn book is successfull').toString())
+
+    props.closeCheckInBookDialog()
   }
+
+
 
   const getStepContent = (step: number) => {
     switch (step) {
@@ -149,14 +168,21 @@ const CheckInWizardMain = (props: { closeCheckInBookDialog: () => void, bookChec
         >
           Previous
         </Button>
-        <Button
-          variant='contained'
-          color={stepCondition ? 'success' : 'primary'}
-          {...(!stepCondition ? { endIcon: <Icon icon='mdi:arrow-right' /> } : {})}
-          onClick={() => (stepCondition ? alert('Submitted..!!') : handleNext())}
-        >
-          {stepCondition ? 'Submit' : 'Next'}
-        </Button>
+        {isLoading && (
+          <Fragment>
+            <CircularProgress color='inherit' size={20} />
+          </Fragment>
+        )}
+        {!isLoading && (
+          <Button
+            variant='contained'
+            color={stepCondition ? 'success' : 'primary'}
+            {...(!stepCondition ? { endIcon: <Icon icon='mdi:arrow-right' /> } : {})}
+            onClick={() => (stepCondition ? submitCheckIn(bookCheckInOutItem) : handleNext())}
+          >
+            {stepCondition ? 'Submit' : 'Next'}
+          </Button>
+        )}
       </Box>
     )
   }

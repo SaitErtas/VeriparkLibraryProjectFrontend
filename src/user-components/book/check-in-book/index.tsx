@@ -28,7 +28,7 @@ export default function CheckInBookMain(props: { openCheckInBookPopup: boolean, 
       setIsLoadingForCheckOutBook(true)
       setLoading(true)
       const resultAxios = await userAxios.get({
-        method: 'Books/get-checked-out-list/'
+        method: 'Books/get-checked-out-list/?id=' + props.bookListItem.id
       })
       const responseData = await resultAxios?.data.result
 

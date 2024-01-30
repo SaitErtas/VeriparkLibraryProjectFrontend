@@ -30,6 +30,7 @@ import { Button, useTheme } from '@mui/material'
 import AddBook from 'src/user-components/book/add-book';
 import CheckOutBook from 'src/user-components/book/check-out-book';
 import CheckInBookMain from 'src/user-components/book/check-in-book';
+import UpdateBook from 'src/user-components/book/update-book';
 
 
 interface CellType {
@@ -53,6 +54,7 @@ const Home = () => {
   const [value, setValue] = useState<string>('')
   const [openAddBookPopup, setOpenAddBookPopup] = useState<boolean>(false)
   const [openCheckOutBookPopup, setOpenCheckOutBookPopup] = useState<boolean>(false)
+  const [openUpdateBookPopup, setOpenUpdateBookPopup] = useState<boolean>(false)
   const [openCheckInBookPopup, setOpenCheckInBookPopup] = useState<boolean>(false)
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 })
 
@@ -97,6 +99,13 @@ const Home = () => {
 
     }
 
+    const handlEdit = () => {
+      setBookListItem(row)
+      setOpenUpdateBookPopup(true)
+      handleRowOptionsClose()
+
+    }
+
     return (
       <>
         <IconButton size='small' onClick={handleRowOptionsClick}>
@@ -117,11 +126,7 @@ const Home = () => {
           }}
           PaperProps={{ style: { minWidth: '8rem' } }}
         >
-          <MenuItem
-            component={Link}
-            sx={{ '& svg': { mr: 2 } }}
-            onClick={handleRowOptionsClose}
-            href='/apps/user/view/overview/'
+          <MenuItem sx={{ '& svg': { mr: 2 } }} onClick={handlEdit}
           >
             <Icon icon='mdi:book-outline' fontSize={20} />
             Edit
@@ -236,6 +241,11 @@ const Home = () => {
     getBookList();
   }
 
+  const closeUpdateBookDialog = () => {
+    setOpenUpdateBookPopup(false)
+    getBookList();
+  }
+
   return (
 
     <Grid container spacing={6} sx={{ justifyContent: 'center', mt: 2 }}>
@@ -296,9 +306,10 @@ const Home = () => {
 
       <AddBook openAddBookPopup={openAddBookPopup} closeAddBookDialog={closeAddBookDialog} ></AddBook>
       {bookListItem && <CheckOutBook openCheckOutBookPopup={openCheckOutBookPopup} closeCheckOutBookDialog={closeCheckOutBookDialog} bookListItem={bookListItem} ></CheckOutBook>}
+      {bookListItem && <UpdateBook openUpdateBookPopup={openUpdateBookPopup} closeUpdateBookDialog={closeUpdateBookDialog} updateBookItem={bookListItem} ></UpdateBook>}
 
       <Grid item xs={12} xl={8} lg={8} sm={8}>
-      {bookListItem && <CheckInBookMain openCheckInBookPopup={openCheckInBookPopup} closeCheckInBookDialog={closeCheckInBookDialog} bookListItem={bookListItem}></CheckInBookMain>}
+        {bookListItem && <CheckInBookMain openCheckInBookPopup={openCheckInBookPopup} closeCheckInBookDialog={closeCheckInBookDialog} bookListItem={bookListItem}></CheckInBookMain>}
       </Grid>
 
 
