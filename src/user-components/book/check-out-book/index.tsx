@@ -21,7 +21,7 @@ export default function CheckOutBook(props: { openCheckOutBookPopup: boolean, cl
 
   useEffect(() => {
     setCheckOutBookType({ bookId: props.bookListItem.id, bookName: props.bookListItem.name, userName: "", tckn: 0, phoneNumber: "" })
-  }, [props.bookListItem.id, props.bookListItem.name])
+  }, [props])
 
   const CheckOutBook = async () => {
 

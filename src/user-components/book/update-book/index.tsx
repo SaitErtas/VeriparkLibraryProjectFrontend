@@ -44,7 +44,7 @@ export default function UpdateBook(props: { openUpdateBookPopup: boolean, closeU
     })
     const responseData = await resultAxios?.data.result
 
-    if (resultAxios?.status == 200) await toast.success(t('Updating book is successfull').toString())
+    if (resultAxios?.status == 200) await toast.success(t('Updating book is successfull'))
 
     setUpdateBookType({ id: 0, isbn: "", name: "", price: 0, publishDate: new Date(), stockAmount: 0 })
     setIsLoadingForAddBook(false)
